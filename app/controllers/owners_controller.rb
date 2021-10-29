@@ -18,11 +18,13 @@ class OwnersController < ApplicationController
 
     # Create/POST
     def create 
-        owner = Owner.create(owner_params)
-        if owner 
-            render json: owner 
+        owner = Owner.create!(owner_params)
+        owner.dogs.create!(dog_params)
+        if owner.valid?
+            render json: owner
         else 
-            render json: {error: 'Owner could not be created'}
+            byebug
+            render json: { errors: owner.errors.full_messages}
         end 
     end
 
@@ -42,7 +44,12 @@ class OwnersController < ApplicationController
     private 
 
     def owner_params 
-        params.require(:owner).permit(:name)
+        params.require(:owner).permit(:name, :age)
+    end 
+
+
+    def dog_params
+        params.require(:dog).permit(:name)
     end 
 
     def set_owner 
